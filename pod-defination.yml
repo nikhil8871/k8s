@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-deployment
+  annotations:
+    Kubernetes.io/change-cause: "Changing to httpd server"
+  labels:
+    type: frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      name: My-Pod
+      type: frontend
+  template:
+    metadata:
+      labels:
+        name: My-Pod
+        type: frontend
+    spec:
+      containers:
+      - name: nginx-container
+        image: httpd
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: html-volume
+          mountPath: /usr/share/nginx/html
+      volumes:
+      - name: html-volume
+        configMap:
+          name: nginx-html-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nodeport-service
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    targetPort: 80
+    nodePort: 30001
+  selector:
+    name: My-Pod
+    type: frontend

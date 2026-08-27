@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: root-server
+  labels:
+    name: root-server
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: 1st-deployment
+  namespace: root-server
+  annotations:
+    kubernetes.io/change-cause: "Correcting the container name"
+  labels:
+    name: nikhil-deployment
+    type: frontend
+spec:
+  template:
+    metadata:
+      name: nikhil-pod
+      labels:
+        type: frontend
+    spec:
+      containers:
+      - name: container
+        image: httpd
+  replicas: 3
+  selector:
+    matchLabels:
+      type: frontend
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nodeport
+  namespace: root-server
+  labels:
+    type: frontend
+spec:
+  type: NodePort
+  ports:
+  -  targetPort: 80
+     port: 80
+     nodePort: 30002
+  selector:
+    type: frontend
