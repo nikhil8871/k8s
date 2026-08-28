@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Node
+metadata:
+  name: node01
+spec:
+  taints:
+  -  key: "spray"
+#     operator: "Equal" Taint m operator nhi hota"
+     value: "mortein"
+     effect: "NoSchedule"
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-pod
+  labels:
+    type: front-end
+spec:
+  containers:
+  -  name: nginx
+     image: nginx
+  tolerations:
+  -  key: "spray"
+     operator: "Equal"
+     value: "mortein"
+     effect: "NoSchedule"
+
+#Taint (The Lock): Applied to a Node to repel Pods. Unless a Pod can "tolerate" the taint, it will never be scheduled on that Node.The POD have power  and it will come when we create a pod with taints key pair value.
+#Toleration (The Key): Applied to a Pod in its spec.tolerations. It gives the Pod permission to schedule on a tainted Node. toleration allows a Pod to run on a tainted node, but does not guarantee it will land there (it can still land on any untainted node).
+
+#CMD: kubectl taint node node01 spray=mortein:NoSchedule
+# ######To remove the taint:######
+#CMD: kubectl taint node node01 spray=mortein:NoSchedule-
+
+##################NoSchedule vs NoExecute:
+#NoSchedule: Only blocks new untolerated pods from scheduling. Existing pods continue running.
+#NoExecute: Blocks new untolerated pods and immediately evicts any currently running pods on that node that lack the toleration.
+#PreferNoSchedule: This effect is similar to NoSchedule, but it is a "soft" version. It allows the scheduler to schedule pods on the node if no other nodes are available.
