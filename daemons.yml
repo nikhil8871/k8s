@@ -57,17 +57,17 @@ kind: DaemonSet
 metadata:
   name: daemonset
   namespace: daemon
-  labels:
-    type: daemonset
+  labels:  # (OPTIONAL - you can completely remove this)
+    type: daemonset  #(OPTIONAL - you can completely remove this)
 spec:
   selector:
     matchLabels:
-      service: log-collector
+      service: log-collector     # REQUIRED: must match template
   template:
     metadata:
       name: daemon
       labels:
-        service: log-collector
+        service: log-collector  # REQUIRED: tells controller "this is my pod"
     spec: 
       containers:
       -  name: fluentd-worker
@@ -99,3 +99,25 @@ spec:
 #  name: my-node
 #  labels:
 #    black: white
+
+
+
+###3. How does the DaemonSet find and place pods on every node?**
+#A Deployment and a DaemonSet **do not communicate with each other**, nor does a Deployment tell a DaemonSet where to put pods.
+
+#The **DaemonSet controller** handles node placement automatically using this exact mechanism:
+
+#1. **Node Discovery:** The DaemonSet controller continuously queries the Kubernetes API: *"What nodes currently exist in this cluster that are ready?"*
+#2. **Scheduling Loop:**
+#* If there are **2 nodes** (`node-1`, `node-2`), the controller checks:
+#* *Does `node-1` have a pod managed by this DaemonSet?* No $\rightarrow$ create one with `spec.nodeName: node-1`.
+#* *Does `node-2` have a pod managed by this DaemonSet?* No $\rightarrow$ create one with `spec.nodeName: node-2`.
+#3. **Cluster Expansion:** If you add a 3rd node tomorrow (`node-3`), the controller detects the new node and automatically launches a DaemonSet pod on it.
+#4. **Cluster Shrinking:** If `node-2` is deleted, Kubernetes garbage-collects the pod that was running on it.
+
+### **Summary**
+
+#* **Deployment:** Asks the Scheduler, *"Find any available node with capacity (and matching affinity) to host my 2 replicas."* (Both could land on `node-1## or one on each).
+#* **DaemonSet:** Ignores replica counts and tells the API, *"Ensure exactly 1 pod runs on every single node across the entire cluster, regardless of namespace."*
+
+#daemons not cehck the ns ,daemons check the cluster and place the pods on every node, but deployment check the ns and place the pods on the nodes in that ns only.
