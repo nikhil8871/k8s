@@ -1,0 +1,101 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: daemon
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-daemons
+  labels:
+    name: deployment-daemons
+    type: frontend
+  namespace: daemon
+  annotations:
+    kubernetes.io/change-cause: daemonwithdeployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      name: deployment-daemon
+      type: frontend
+  template:   
+    metadata:
+      name: deployment-pod
+      labels:
+        name: deployment-daemon
+        type: frontend
+    spec:
+      containers:
+      - name: nginx-container
+        image: nginx
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "256Mi"
+      tolerations:
+      -  key: "black"
+         operator: "Equal"
+         value: "white"
+         effect: "NoSchedule"
+      affinity:
+         nodeAffinity:
+           requiredDuringSchedulingIgnoredDuringExecution:
+             nodeSelectorTerms:
+             -  matchExpressions:
+                -  key: "black"
+                   operator: "In"
+                   values: 
+                   -  "white"
+
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: daemonset
+  namespace: daemon
+  labels:
+    type: daemonset
+spec:
+  selector:
+    matchLabels:
+      service: log-collector
+  template:
+    metadata:
+      name: daemon
+      labels:
+        service: log-collector
+    spec: 
+      containers:
+      -  name: fluentd-worker
+         image: fluent/fluentd:latest
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service
+  namespace: daemon
+spec:
+  type: NodePort
+  ports:
+  -  targetPort: 80
+     port: 90
+     nodePort: 30061
+  selector:
+    name: deployment-daemon
+    type: frontend
+
+# For creating a node with affinity and toleration, you can use the following command:
+#  kubectl label node minikube black=white  //we have label the node
+# kubectl get node minikube --show-labels
+# kubectl taint node minikube black=white:NoSchedule
+#OR YAML File:
+#apiVersion: v1
+#kind: Node
+#metadata:
+#  name: my-node
+#  labels:
+#    black: white
