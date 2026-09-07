@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-deployment
+  labels:
+    type: front-end
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      type: front-end-replica
+  template:
+    metadata:
+      name: my-pod
+      labels:
+        type: front-end-replica
+    spec:
+      containers:
+      -  name: mysql
+         image: nginx
+         volumeMounts:
+         -  mountPath: /var/lib/mysql
+            name: dbvol
+      volumes:
+      -  name: dbvol
+         hostPath:
+           path: /data
+           type: DirectoryOrCreate  #if /data directory is not there then it will create.
+    
+      
