@@ -1,0 +1,25 @@
+#A ConfigMap in Kubernetes is an API object used to store non-confidential configuration data in key-value pairs. It decouples environment-specific configurations from container images, making applications portable across environments (dev, stage, prod) without rebuilding the image.
+
+#For confidential data like passwords, tokens, or SSH keys, use Secrets instead of ConfigMaps.
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-info
+  namespace: default 
+data:
+  app_env: "productoin"
+  port: "8080"
+  app.properties: |
+    databaes.timeout=30
+    cache.enables=true
+
+
+#The pipe character (|) is standard YAML syntax called the Literal Block Scalar.
+
+#It tells the YAML parser to treat everything indented underneath it as a multi-line string exactly as written, preserving all newlines and indentation.
+
+#Why it is used in a ConfigMap
+#Without the pipe (|), YAML expects key-value pairs or single-line strings. If you want to embed an entire file's content (like a .properties, .conf, or .json file) inside a ConfigMap, | lets you paste the multi-line file directly:
+
+

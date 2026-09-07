@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: command-deployment
+  namespace: default
+  annotations:
+    kubernetes.io/change-cause: "command&argument" # Changed '=' to ':'
+  labels:
+    name: command-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels: # Changed from 'labels:' to 'matchLabels:'
+      name: command-deployment
+  template:
+    metadata:
+      labels:
+        name: command-deployment
+    spec:
+      containers:
+      - name: debian
+        image: debian
+        command: ["printenv"]
+        args: ["KUBERNETES_PORT", "HOSTNAME"]
+        resources:
+          requests:
+            memory: "500M"
+            cpu: "1m"
+          limits:
+            memory: "1G"
+            cpu: "2m"
+
+---
+apiVersion: apps/v1
+kind: DaemonSet # Changed from 'Daemon' to 'DaemonSet'
+metadata:
+  name: command-deployment-daemon
+  namespace: default
+  labels:
+    name: command-deployment-daemon
+spec:
+  selector:
+    matchLabels: # Changed to matchLabels
+      name: command-deployment-daemon
+  template:
+    metadata:
+      labels:
+        name: command-deployment-daemon
+    spec:
+      containers:
+      - name: debian
+        image: debian

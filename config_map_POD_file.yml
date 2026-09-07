@@ -1,0 +1,39 @@
+#apiVersion: v1
+#kind: Pod
+#metadata:
+#  name: config-map-checking
+#  namespace: default 
+#spec:
+##  containers:
+#  - name: nginx
+#    image: nginx
+#    envFrom:
+#    -  configMapRef:
+#         name: app-info
+       
+#OR we can use by specific configmap keys
+apiVersion: v1
+kind: Pod
+metadata:
+  name: config-map-checking
+  namespace: default 
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    env:
+    -  name: app-env
+       valueFrom:
+         configMapKeyRef:
+           name: app-info
+           key: app_env
+    -  name: app-port
+       valueFrom:
+         configMapKeyRef:
+           name: app-info
+           key: port
+    -  name: data-coonection
+       valueFrom:
+         configMapKeyRef:
+           name: app-info
+           key:  app.properties
