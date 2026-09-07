@@ -52,23 +52,39 @@ spec:
                    -  "white"
 
 ---
+<<<<<<< HEAD
 #must match label fof pod and daemon selector
+=======
+>>>>>>> 71322a3bee60b32c4a4e67c94af7fd004c55a5ec
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: daemonset
   namespace: daemon
+<<<<<<< HEAD
   labels:  # (OPTIONAL - you can completely remove this)
     type: daemonset  #(OPTIONAL - you can completely remove this)
 spec:
   selector:
     matchLabels:
       service: log-collector     # REQUIRED: must match template
+=======
+  labels:
+    type: daemonset
+spec:
+  selector:
+    matchLabels:
+      service: log-collector
+>>>>>>> 71322a3bee60b32c4a4e67c94af7fd004c55a5ec
   template:
     metadata:
       name: daemon
       labels:
+<<<<<<< HEAD
         service: log-collector  # REQUIRED: tells controller "this is my pod"
+=======
+        service: log-collector
+>>>>>>> 71322a3bee60b32c4a4e67c94af7fd004c55a5ec
     spec: 
       containers:
       -  name: fluentd-worker
@@ -99,6 +115,7 @@ spec:
 #metadata:
 #  name: my-node
 #  labels:
+<<<<<<< HEAD
 #    black: white
 
 
@@ -122,3 +139,6 @@ spec:
 #* **DaemonSet:** Ignores replica counts and tells the API, *"Ensure exactly 1 pod runs on every single node across the entire cluster, regardless of namespace."*
 
 #daemons not cehck the ns ,daemons check the cluster and place the pods on every node, but deployment check the ns and place the pods on the nodes in that ns only.
+=======
+#    black: white
+>>>>>>> 71322a3bee60b32c4a4e67c94af7fd004c55a5ec
